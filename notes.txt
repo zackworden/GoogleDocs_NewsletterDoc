@@ -1,0 +1,18 @@
+reports needed:
+	advertiser by year
+	all advertisers by year
+	advertiser by month
+	all advertisers by month
+	rundown by newsletter type / sheet
+
+sheet activities needed
+	build newsletter positions / prefabs, by day of the week newsletter sends on
+	
+notes
+	make advertiser name case insensitive
+	include ad position, as this matters for some of the brands but not for others and i want to keep things identical
+	account for new report columns / newsletter details
+	
+wishlist
+	export individual advertisers by month as seperate CSV files?
+	
