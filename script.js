@@ -2,29 +2,233 @@
 	var newsletterDocDetails = 	{
 									name : 'Prototype Doc',
 									year : 2016,
+									reportSheet : 'Reports',
 								};
+	var newsletterDocStructure	= 	{
+										sendColumn : 1,
+										openColumn : 2,
+										dateColumn : 4,
+										newsletterType : 5,
+										adPositionColumn : 6,
+										advertiserColumn : 7,
+										clicksColumn : 9,
+									};
 // vars
 	var thisSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
 	var ssActions = new SpreadsheetActions();
+	var ssReports = new SpreadsheetReports();
+	var ssReports2 = new Reports();
 // enums
 	var reportPeriods = {
 							monthly	 : 'monthly',
 							yearly	 : 'yearly',
 						};
 // classes
+	function Reports()
+	{
+		this.AdvertiserReportFullYear = function( theSheet, advertiserName )
+		{
+			var allResults = [];
+			
+			// consts
+			var indexToColAdjustment = 1;
+			
+			// vars
+			var counter = 0;
+			var numOfRows = theSheet.getLastRow();
+			var numOfCols = theSheet.getLastColumn();
+			var theRange = theSheet.getRange(3,1,numOfRows,numOfCols);
+			var theResults = theRange.getValues();
+			var numOfResults = theResults.length;
+			var thisAdvertiserResultSet;
+			
+			for ( counter = 0; counter < numOfResults; counter ++ )
+			{
+				if ( theResults[counter][(newsletterDocStructure.advertiserColumn - indexToColAdjustment)].toUpperCase() == advertiserName.toUpperCase() )
+				{
+					thisAdvertiserResultSet = new AdvertiserResultSet( theResults[counter][newsletterDocStructure.advertiserColumn - indexToColAdjustment] );
+					thisAdvertiserResultSet.Insert(
+						theResults[counter][newsletterDocStructure.dateColumn - indexToColAdjustment],
+						theResults[counter][newsletterDocStructure.sendColumn - indexToColAdjustment], 
+						theResults[counter][newsletterDocStructure.openColumn - indexToColAdjustment],
+						theResults[counter][newsletterDocStructure.clicksColumn - indexToColAdjustment],
+						theResults[counter][newsletterDocStructure.newsletterType - indexToColAdjustment],
+						theResults[counter][newsletterDocStructure.adPositionColumn - indexToColAdjustment] 
+						);
+					
+					this.AddAdvertiserResultSet( thisAdvertiserResultSet );
+				}
+			}
+			
+			this.BuildReport = function()
+			{
+				Logger.log(this.allResults);
+			}
+		}
+		this.AllAdvertiserReportFullYear = function()
+		{
+			this.allResults = [];
+			
+			this.BuildReport = function()
+			{
+				
+			}
+		}
+		this.AdvertiserReportMonth = function()
+		{
+			this.allResults = [];
+			
+			this.BuildReport = function()
+			{
+				
+			}
+		}
+		this.AllAdvertiserReportMonth = function()
+		{
+			this.allResults = [];
+			
+			this.BuildReport = function()
+			{
+				
+			}
+		}
+		this.NewsletterReportFullYear = function()
+		{
+			this.allResults = [];
+			
+			this.BuildReport = function()
+			{
+				
+			}
+		}
+		this.NewsletterReportMonth = function()
+		{
+			this.allResults = [];
+			
+			this.BuildReport = function()
+			{
+				
+			}
+		}
+	}
 	function SpreadsheetReports()
 	{
-		this.AdvertiserReport = function()
+		this.allResultSets = [];
+		
+		// result gathering
+		this.AdvertiserReport = function( theSheet, advertiserName )
 		{
+			// consts
+			var indexToColAdjustment = 1;
 			
+			// vars
+			var counter = 0;
+			var numOfRows = theSheet.getLastRow();
+			var numOfCols = theSheet.getLastColumn();
+			var theRange = theSheet.getRange(3,1,numOfRows,numOfCols);
+			var theResults = theRange.getValues();
+			var numOfResults = theResults.length;
+			var thisAdvertiserResultSet;
+			
+			for ( counter = 0; counter < numOfResults; counter ++ )
+			{
+				if ( theResults[counter][(newsletterDocStructure.advertiserColumn - indexToColAdjustment)].toUpperCase() == advertiserName.toUpperCase() )
+				{
+					thisAdvertiserResultSet = new AdvertiserResultSet( theResults[counter][newsletterDocStructure.advertiserColumn - indexToColAdjustment] );
+					thisAdvertiserResultSet.Insert(
+						theResults[counter][newsletterDocStructure.dateColumn - indexToColAdjustment],
+						theResults[counter][newsletterDocStructure.sendColumn - indexToColAdjustment], 
+						theResults[counter][newsletterDocStructure.openColumn - indexToColAdjustment],
+						theResults[counter][newsletterDocStructure.clicksColumn - indexToColAdjustment],
+						theResults[counter][newsletterDocStructure.newsletterType - indexToColAdjustment],
+						theResults[counter][newsletterDocStructure.adPositionColumn - indexToColAdjustment] 
+						);
+					
+					this.AddAdvertiserResultSet( thisAdvertiserResultSet );
+				}
+			}
 		}
-		this.AllAdvertiserReport = function()
+		this.AllAdvertiserReport = function( theSheet )
 		{
+			// consts
+			var indexToColAdjustment = 1;
 			
+			// vars
+			var counter = 0;
+			var numOfRows = theSheet.getLastRow();
+			var numOfCols = theSheet.getLastColumn();
+			var theRange = theSheet.getRange(3,1,numOfRows,numOfCols);
+			var theResults = theRange.getValues();
+			var numOfResults = theResults.length;
+			var thisAdvertiserResultSet;
+			
+			for ( counter = 0; counter < numOfResults; counter ++ )
+			{
+				thisAdvertiserResultSet = new AdvertiserResultSet( theResults[counter][newsletterDocStructure.advertiserColumn - indexToColAdjustment] );
+				thisAdvertiserResultSet.Insert(
+					theResults[counter][newsletterDocStructure.dateColumn - indexToColAdjustment],
+					theResults[counter][newsletterDocStructure.sendColumn - indexToColAdjustment], 
+					theResults[counter][newsletterDocStructure.openColumn - indexToColAdjustment],
+					theResults[counter][newsletterDocStructure.clicksColumn - indexToColAdjustment],
+					theResults[counter][newsletterDocStructure.newsletterType - indexToColAdjustment],
+					theResults[counter][newsletterDocStructure.adPositionColumn - indexToColAdjustment] 
+					);
+				
+				this.AddAdvertiserResultSet( thisAdvertiserResultSet );
+			}
 		}
+		this.AddAdvertiserResultSet = function( theAdvertiserResultSet )
+		{
+			var theResultSetIndex = this.GetDoesAdvertiserResultSetExist( theAdvertiserResultSet.advertiserName );
+			
+			if ( theResultSetIndex == -1 )
+			{
+				this.allResultSets.push( theAdvertiserResultSet );
+			}
+			else
+			{
+				this.allResultSets[theResultSetIndex].InsertResultSet( theAdvertiserResultSet );
+			}
+		}
+		this.GetDoesAdvertiserResultSetExist = function( theAdvertiserName )
+		{
+			var resultSetIndex = -1;
+			var counter = 0;
+			var numOfResultSets = this.allResultSets.length;
+			
+			for ( counter = 0; counter < numOfResultSets; counter ++ )
+			{
+				if ( this.allResultSets[counter].advertiserName.toUpperCase() == theAdvertiserName.toUpperCase() )
+				{
+					resultSetIndex = counter;
+					break;
+				}
+			}
+			
+			return resultSetIndex;
+		}
+	
 	}
 	function SpreadsheetActions()
 	{
+		this.BuildReportSheet = function( theResultSetCollection )
+		{
+			var rowOffset = 0;
+			var reportSheet = thisSpreadsheet.getSheetByName( newsletterDocDetails.reportSheet );
+			var numOfRows = reportSheet.getMaxRows();
+			var numOfCols = reportSheet.getMaxColumns();
+			var reportRange = reportSheet.getRange(1,1,numOfRows, numOfCols);
+			this.ClearSheet( reportSheet );
+			
+			var counter = 0;
+			var numOfResultSets = theResultSetCollection.length;
+			
+			for ( counter = 0; counter < numOfResultSets; counter ++ )
+			{
+				this.BuildAdvertiserResultSet( reportRange, counter + rowOffset, theResultSetCollection[counter] );
+				rowOffset += (theResultSetCollection[counter].allResults.length + 3);
+			}
+		}
 		this.BuildWeeklyNewsletterDates = function( booleanArrayOfDaysOfWeek, arrayOfAdPositions, theSheet, currentYear )
 		{
 			// consts
@@ -59,16 +263,65 @@
 		{
 			theSheet.clear();
 		}
+		
+		this.BuildAdvertiserResultSet = function( theRange, rangeAdjustment, theResultSet )
+		{
+			var counter = 0;
+			var numOfResultItems = theResultSet.allResults.length;
+			var resultSetRange = theRange.offset( rangeAdjustment,0, (rangeAdjustment + numOfResultItems + 2) );
+			var resultItemRange;
+			
+			// advertiser result set header
+			resultSetRange.getCell(1, 1).setValue('Advertiser');
+			resultSetRange.getCell(1, 2).setValue(theResultSet.advertiserName);
+			resultSetRange.getCell(2, 1).setValue('Date');
+			resultSetRange.getCell(2, 2).setValue('Publication');
+			resultSetRange.getCell(2, 3).setValue('Newsletter Type');
+			resultSetRange.getCell(2, 4).setValue('Sends');
+			resultSetRange.getCell(2, 5).setValue('Opens');
+			resultSetRange.getCell(2, 6).setValue('Clicks');
+			resultSetRange.getCell(2, 7).setValue('CTR');
+			
+			//  advertiser result body
+			for ( counter = 0; counter < numOfResultItems; counter ++ )
+			{
+				resultSetRange.getCell(3 + counter, 1).setValue(theResultSet.allResults[counter].date);
+				resultSetRange.getCell(3 + counter, 2).setValue( newsletterDocDetails.name );
+				resultSetRange.getCell(3 + counter, 3).setValue(theResultSet.allResults[counter].sendType);
+				resultSetRange.getCell(3 + counter, 4).setValue(theResultSet.allResults[counter].sends);
+				resultSetRange.getCell(3 + counter, 5).setValue(theResultSet.allResults[counter].opens);
+				resultSetRange.getCell(3 + counter, 6).setValue(theResultSet.allResults[counter].clicks);
+				resultSetRange.getCell(3 + counter, 7).setFormula('=F' + (rangeAdjustment + counter + 3) + '/E' + (rangeAdjustment + counter + 3) + '');
+				resultSetRange.getCell(3 + counter, 7).setNumberFormat('0.00');
+				resultSetRange.getCell(3 + counter, 8).setValue(theResultSet.allResults[counter].adPosition);
+				theResultSet.allResults[counter].date
+			}
+		}
+		this.BuildAdvertiserResultSetItem = function( theRange, theResultSetRow )
+		{
+			
+		}
 	}
-	function AdvertiserResultSet( theName,theDate, theSends, theOpens, theClicks, theSendType, adPosition )
+	function AdvertiserResultSet( theName )
 	{
-		this.advertiserName;
+		this.advertiserName = theName;
 		this.allResults = [];
 		
+		this.InsertResultSet = function( theAdvertiserResultSet )
+		{
+			this.Insert( 	
+				theAdvertiserResultSet.allResults[0].date, 
+				theAdvertiserResultSet.allResults[0].sends, 
+				theAdvertiserResultSet.allResults[0].opens, 
+				theAdvertiserResultSet.allResults[0].clicks, 
+				theAdvertiserResultSet.allResults[0].sendType, 
+				theAdvertiserResultSet.allResults[0].adPosition 
+				);
+		}
 		this.Insert = function( theDate, theSends, theOpens, theClicks, theSendType, adPosition )
 		{
-			var tempResultItem = new ResultItem_(theDate, theSends, theOpens, theClicks, theSendType, adPosition);
-			this.allResultItems.push(tempResultItem);
+			var tempResultItem = new AdvertiserResultSetItem(theDate, theSends, theOpens, theClicks, theSendType, adPosition);
+			this.allResults.push(tempResultItem);
 		}
 	}
 	function AdvertiserResultSetItem( theDate, theSends, theOpens, theClicks, theSendType, adPosition )
@@ -85,8 +338,14 @@
 	{
 		var daysOfWeekArray = [false, false, false, true, true, false, false];
 		var adPositionArray = ['Top','Middle'];
-		var theSheet = thisSpreadsheet.getSheetByName('testSheet');
+		var theSheet = thisSpreadsheet.getSheetByName('Sheet1');
 		
-		ssActions.BuildWeeklyNewsletterDates(daysOfWeekArray, adPositionArray, theSheet, newsletterDocDetails.year);
-		Browser.msgBox(newsletterDocDetails.name);
+		//ssActions.BuildWeeklyNewsletterDates(daysOfWeekArray, adPositionArray, theSheet, newsletterDocDetails.year);
+		/*
+		ssReports.AllAdvertiserReport(theSheet);
+		
+		ssActions.BuildReportSheet( ssReports.allResultSets );
+		*/
+		ssReports2.AdvertiserReportFullYear(theSheet, 'Zack');
+		ssReports2.BuildReport();
 	}
