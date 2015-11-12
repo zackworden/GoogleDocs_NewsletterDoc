@@ -18,17 +18,53 @@
 	var ssActions = new SpreadsheetActions();
 	var ssReports = new SpreadsheetReports();
 	var ssReports2 = new Reports();
+	var reportResults
 // enums
 	var reportPeriods = {
 							monthly	 : 'monthly',
 							yearly	 : 'yearly',
 						};
 // classes
+	function ResultCollection()
+	{
+		this.advertiserResultSets = [];
+		
+		this.Get_advertiserResultSetIndex = function( advertiserName )
+		{
+			var resultSetIndex = -1;
+			var counter = 0;
+			var numOfResultSets = this.advertiserResultSets.length;
+			
+			for ( counter = 0; counter < numOfResultSets; counter ++ )
+			{
+				if ( this.advertiserResultSets[counter].advertiserName.toUpperCase() == advertiserName.toUpperCase() )
+				{
+					resultSetIndex = counter;
+					break;
+				}
+			}
+			
+			return resultSetIndex;
+		}
+		this.AddAdvertiserResultSet = function( advertiserResultSet )
+		{
+			var theResultSetIndex = this.Get_advertiserResultSetIndex( advertiserResultSet.advertiserName );
+			
+			if ( theResultSetIndex == -1 )
+			{
+				this.advertiserResultSets.push( advertiserResultSet );
+			}
+			else
+			{
+				this.advertiserResultSets[theResultSetIndex].InsertResultSet( advertiserResultSet );
+			}
+		}
+	}
 	function Reports()
 	{
 		this.AdvertiserReportFullYear = function( theSheet, advertiserName )
 		{
-			var allResults = [];
+			var allResults = new ResultCollection();
 			
 			// consts
 			var indexToColAdjustment = 1;
@@ -56,13 +92,55 @@
 						theResults[counter][newsletterDocStructure.adPositionColumn - indexToColAdjustment] 
 						);
 					
-					this.AddAdvertiserResultSet( thisAdvertiserResultSet );
+					this.allResults.AddAdvertiserResultSet( thisAdvertiserResultSet );
 				}
 			}
 			
-			this.BuildReport = function()
+			this.BuildReport = function( reportSheet )
 			{
-				Logger.log(this.allResults);
+				Logger.log( allResults[0] );
+				
+				
+				
+				var theRange = reportSheet.getRange( 1,1,reportSheet.getMaxRows(),reportSheet.getMaxColumns() );
+				var advertiserCounter = 0;
+				var numOfAdvertiserResults = allResults.length;
+				var advertiserItemCounter = 0;
+				var numOfAdvertiserItems = 0;
+				var rangeAdjustment = 0;
+				
+				for ( advertiserCounter = 0; advertiserCounter < numOfAdvertiserResults; advertiserCounter ++ )
+				{
+					Logger.log( allResults[advertiserCounter].advertiserName );
+					
+					// create header
+					theRange.getCell(1, 1).setValue('Advertiser');
+					theRange.getCell(1, 2).setValue(allResults[advertiserCounter].advertiserName);
+					theRange.getCell(2, 1).setValue('Date');
+					theRange.getCell(2, 2).setValue('Publication');
+					theRange.getCell(2, 3).setValue('Newsletter Type');
+					theRange.getCell(2, 4).setValue('Sends');
+					theRange.getCell(2, 5).setValue('Opens');
+					theRange.getCell(2, 6).setValue('Clicks');
+					theRange.getCell(2, 7).setValue('CTR');
+					
+					// for each, list advertiser itesm
+					numOfAdvertiserItems = allResults[advertiserCounter].allResults.length;
+					
+					for ( advertiserItemCounter = 0; advertiserItemCounter < numOfAdvertiserItems; advertiserItemCounter ++ )
+					{
+						theRange.getCell(3 + advertiserItemCounter, 1).setValue( allResults[advertiserCounter].allResults[advertiserItemCounter].date );
+						theRange.getCell(3 + advertiserItemCounter, 2).setValue( newsletterDocDetails.name );
+						theRange.getCell(3 + advertiserItemCounter, 3).setValue( allResults[advertiserCounter].allResults[advertiserItemCounter].sendType );
+						theRange.getCell(3 + advertiserItemCounter, 4).setValue( allResults[advertiserCounter].allResults[advertiserItemCounter].sends );
+						theRange.getCell(3 + advertiserItemCounter, 5).setValue( allResults[advertiserCounter].allResults[advertiserItemCounter].opens );
+						theRange.getCell(3 + advertiserItemCounter, 6).setValue( allResults[advertiserCounter].allResults[advertiserItemCounter].clicks );
+						theRange.getCell(3 + advertiserItemCounter, 7).setFormula('=F' + ( advertiserItemCounter + 3) + '/E' + ( counter + 3) + '' );
+						theRange.getCell(3 + advertiserItemCounter, 7).setNumberFormat('0.00');
+						theRange.getCell(3 + advertiserItemCounter, 8).setValue( allResults[advertiserCounter].allResults[advertiserItemCounter].adPosition );
+					}
+					Logger.log('report built!');
+				}
 			}
 		}
 		this.AllAdvertiserReportFullYear = function()
@@ -74,34 +152,7 @@
 				
 			}
 		}
-		this.AdvertiserReportMonth = function()
-		{
-			this.allResults = [];
-			
-			this.BuildReport = function()
-			{
-				
-			}
-		}
-		this.AllAdvertiserReportMonth = function()
-		{
-			this.allResults = [];
-			
-			this.BuildReport = function()
-			{
-				
-			}
-		}
 		this.NewsletterReportFullYear = function()
-		{
-			this.allResults = [];
-			
-			this.BuildReport = function()
-			{
-				
-			}
-		}
-		this.NewsletterReportMonth = function()
 		{
 			this.allResults = [];
 			
@@ -347,5 +398,5 @@
 		ssActions.BuildReportSheet( ssReports.allResultSets );
 		*/
 		ssReports2.AdvertiserReportFullYear(theSheet, 'Zack');
-		ssReports2.BuildReport();
+		ssReports2.BuildReport( thisSpreadsheet.getSheetByName(newsletterDocDetails.reportSheet) );
 	}
