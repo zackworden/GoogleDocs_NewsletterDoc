@@ -36,7 +36,7 @@
 			var numOfAdPositions = arrayOfAdPositions.length;
 			var counter = 0;
 			var rowCounter = 1;
-			var theSheetRange = theSheet.getRange(3,3,1500,2);
+			var theSheetRange = theSheet.getRange(theDateCol,3,1500,2);
 			var theDate = new Date();
 			
 			for ( counter = 0; counter < numOfDaysInYear; counter ++ )
@@ -62,7 +62,6 @@
 		
 	}
 
-	
 	function AdvertiserReports()
 	{
 		this.resultCollection = new ResultCollection();
@@ -75,7 +74,7 @@
 			var firstCol = 1;
 			var numOfRows = theSheet.getLastRow();
 			var numOfCols = theSheet.getLastColumn();
-			var theRange = theSheet.getRange(firstRow,firstCol,numOfRows , numOfCols - (firstCol + 1) );
+			var theRange = theSheet.getRange(firstRow,firstCol,numOfRows - (firstRow - 1), numOfCols - (firstCol - 1) );
 			var theValues = theRange.getValues();
 			var numOfValues = theValues.length;
 			var thisResultSet;
@@ -96,6 +95,7 @@
 					this.resultCollection.AddResultSet( thisResultSet );
 				}
 			}
+			//Logger.log( this.resultCollection.allResultSets[0].allResultItems );
 		}
 		this.BuildResults = function( reportSheet )
 		{
@@ -172,7 +172,7 @@
 			{
 				this.allResultSets.push( theResultSet );
 			}
-			Logger.log( this.allResultSets );
+			Logger.log( this.allResultSets[0].allResultItems );
 		}
 	}
 	function ResultSet( theName )
@@ -188,6 +188,8 @@
 		this.AddResultSet = function( theResultSet )
 		{
 			this.AddResultItem( theResultSet.date, theResultSet.sends, theResultSet.opens, theResultSet.clicks, theResultSet.sendType, theResultSet.adPosition );
+			Logger.log( theResultSet );
+			Logger.log( '\r\n\r\n' );
 			Logger.log( this.allResultItems );
 		}
 	}
@@ -203,14 +205,13 @@
 // functions
 	function Test()
 	{
-		/*
 		var daysOfWeekArray = [false, false, false, true, true, false, false];
 		var adPositionArray = ['Top','Middle'];
 		var theSheet = thisSpreadsheet.getSheetByName('Sheet1');
-		*/
 		//ssActions.BuildWeeklyNewsletterDates(daysOfWeekArray, adPositionArray, theSheet, newsletterDocDetails.year);
 		
-		var theSheet = thisSpreadsheet.getSheetByName('Sheet1');
+		/*
 		AdvertiserReport.GetResults(sheet_test, 'Zack');
 		AdvertiserReport.BuildResults( sheet_report );
+		*/
 	}
